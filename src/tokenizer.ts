@@ -80,7 +80,12 @@ class TextScanner {
   public text: string;
 
   constructor(code: string) {
-    this.code = code;
+    if (code.startsWith('=')) {
+      this.code = code.substring(1);
+    } else {
+      this.code = code;
+    }
+
     this.text = '';
   }
 

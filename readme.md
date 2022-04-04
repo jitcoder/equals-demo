@@ -1,3 +1,15 @@
+How to run:
+
+```
+git clone https://github.com/jitcoder/equals-demo.git
+cd equals-demo
+yarn
+cd packages/server
+yarn start
+
+open http://localhost:3000/
+```
+
 ## Features
 
 * Custom execution engine

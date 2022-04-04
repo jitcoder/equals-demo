@@ -4,6 +4,8 @@ How to run:
 git clone https://github.com/jitcoder/equals-demo.git
 cd equals-demo
 yarn
+./bin/build.sh
+
 cd packages/server
 yarn start
 

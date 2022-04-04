@@ -2,13 +2,5 @@
 
 workspacedir=$(pwd)
 yarn
-mkdir -p public
-yarn build
-cd ui
-yarn
-yarn build
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  cp -r build/ ../public/
-else
-  cp -r build/* ../public
-fi
+yarn workspace @equals-demo/engine build
+yarn workspace @equals-demo/server build

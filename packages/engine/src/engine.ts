@@ -1,8 +1,8 @@
-import { getPostfixStack, isOperator } from './postfix.js';
+import { getPostfixStack } from './postfix.js';
 import { tokenize } from './tokenizer.js';
 import md5 from 'blueimp-md5';
 import IToken from './IToken.js';
-import SpreedSheet from './spreedsheet.js';
+import SpreadSheet from './spreadsheet.js';
 
 const operation = (type: string, stack: any[]) => {
   const right = Number(stack.shift());
@@ -29,12 +29,14 @@ const operation = (type: string, stack: any[]) => {
   }
 }
 
+type TEngineFunction = (stack: any[], sheet: SpreadSheet) => any;
+
 export default class Engine {
   private cache: { [key: string]: IToken[] } = {};
-  private functions: { [key: string]: Function } = {};
-  private sheet: SpreedSheet;
+  private functions: { [key: string]: TEngineFunction } = {};
+  private sheet: SpreadSheet;
 
-  constructor(sheet: SpreedSheet) {
+  constructor(sheet: SpreadSheet) {
     this.sheet = sheet;
   }
 
@@ -49,7 +51,11 @@ export default class Engine {
     return this.cache[hash];
   }
 
-  registerFunction(name: string, f: (stack: any[]) => any) {
+  executeFunction(name: string, stack: any[]) {
+    return this.functions[name](stack, this.sheet);
+  }
+
+  registerFunction(name: string, f: TEngineFunction) {
     this.functions[name.toUpperCase()] = f;
   }
 
@@ -71,7 +77,10 @@ export default class Engine {
 
         stack.unshift(cell.display);
       } else if (item.kind === 'function') {
-        const ret = this.functions[item.value](stack);
+        if (typeof this.functions[item.value] !== 'function') {
+          throw new Error(`missing function ${item.value} in runtime`);
+        }
+        const ret = this.functions[item.value](stack, this.sheet);
         if (ret !== null && ret !== undefined) {
           if (ret instanceof Promise) {
             stack.unshift(await ret);
